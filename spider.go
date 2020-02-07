@@ -89,13 +89,9 @@ func (s *Spider) Run() error {
 	s.seen = make(map[string]bool)
 	s.tokens = make(chan struct{}, s.Goroutines)
 
-	links := s.URL
+	var links []string
+	s.expand = s.URL
 	for ; s.SpiderDepth >= 0; s.SpiderDepth-- {
-		for _, link := range links {
-			s.sync.Add(1)
-			go s.run(link)
-		}
-		s.sync.Wait()
 		links = nil
 		for _, l := range s.expand {
 			if !s.seen[l] {
@@ -103,6 +99,11 @@ func (s *Spider) Run() error {
 				links = append(links, l)
 			}
 		}
+		for _, link := range links {
+			s.sync.Add(1)
+			go s.run(link)
+		}
+		s.sync.Wait()
 	}
 	return nil
 }
@@ -152,4 +153,3 @@ func (s *Spider) run(url string) {
 		s.mu.Unlock()
 	}
 }
-

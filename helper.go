@@ -112,3 +112,9 @@ func (s *Spider) checkContentType(ct string) bool {
 	}
 	return true
 }
+
+func (u *URL) Add(urls ...string) {
+	for _, l := range urls {
+		*u = append(*u, l)
+	}
+}
